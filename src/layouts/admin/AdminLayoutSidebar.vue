@@ -34,6 +34,18 @@ const menuOptions = [
         ),
         key: 'users'
     },
+    {
+        label: () => h(
+            resolveComponent('router-link') as any,
+            {
+                to: {
+                    name: 'admin.cities'
+                }
+            },
+            { default: () => 'Cities'}
+        ),
+        key: 'cities'
+    },
 ]
 const getMenu = (menu: any[]) => {
     return menu.filter((item) => {
