@@ -1,7 +1,17 @@
 <script setup lang="ts">
-import { NButton } from "naive-ui";
+import { NButton, NMessageProvider } from "naive-ui";
+import { onMounted } from "vue";
+import { useAuthStore } from "./stores/use-auth-store";
+const authStore = useAuthStore()
+
+
+onMounted(async () => {
+  authStore.verifyToken()
+})
 </script>
 
 <template>
-  <RouterView></RouterView>
+  <NMessageProvider>
+    <RouterView></RouterView>
+  </NMessageProvider>
 </template>
