@@ -22,6 +22,18 @@ const menuOptions = [
         ),
         key: 'dashboard'
     },
+    {
+        label: () => h(
+            resolveComponent('router-link') as any,
+            {
+                to: {
+                    name: 'admin.users'
+                }
+            },
+            { default: () => 'Users'}
+        ),
+        key: 'users'
+    },
 ]
 const getMenu = (menu: any[]) => {
     return menu.filter((item) => {
