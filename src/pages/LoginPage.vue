@@ -21,6 +21,10 @@ const login = async () => {
 
         if(authStore.user && authStore.user.role == "admin"){
             router.push({name: "admin.dashboard"})
+        }else if(authStore.user && authStore.user.role == "deliverer") {
+            router.push({name: "deliverer.dashboard"})
+        }else {
+            router.push({name: 'index'})
         }
     } catch (error) {
         msg.error("Login error, please verify your email and password")

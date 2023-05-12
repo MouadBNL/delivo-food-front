@@ -165,6 +165,11 @@ const cols = [
                             onClick() {
                                 editableModel.value.id = row.id
                                 editableModel.value.name = row.name
+                                editableModel.value.slug = row.slug
+                                editableModel.value.address = row.address
+                                editableModel.value.phone = row.phone
+                                editableModel.value.coordinates = row.phone
+                                editableModel.value.city_id = row.city.id
                                 modalMode.value = 'update'
                                 showModal.value = true
                             },

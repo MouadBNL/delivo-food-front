@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheAuthLayoutSidebar from './AdminLayoutSidebar.vue'
 import { NLayout, NLayoutHeader, NLayoutSider, NButton, NLayoutFooter, useMessage, useLoadingBar, NCard, NSpin } from "naive-ui"
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/use-auth-store';
 import { onMounted } from 'vue';
+import DelivererLayoutSidebar from "./DelivererLayoutSidebar.vue";
 const route = useRoute()
 const router= useRouter()
 const authStore = useAuthStore()
@@ -50,7 +50,7 @@ onMounted(async () => {
         :native-scrollbar="false"
         bordered
       >
-        <TheAuthLayoutSidebar />
+        <DelivererLayoutSidebar />
       </n-layout-sider>
       <n-layout class="bg-gray-100" style="background-color: rgb(243 244 246 / 0.5)" :native-scrollbar="false">
         <main class="container mx-auto p-6">

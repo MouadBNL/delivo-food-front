@@ -165,8 +165,8 @@ const rolesOption = [
         value: "admin"
     },
     {
-        label: "Delivrer",
-        value: "delivrer"
+        label: "Deliverer",
+        value: "deliverer"
     },
     {
         label: "User",
