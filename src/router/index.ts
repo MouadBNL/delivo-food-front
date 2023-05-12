@@ -27,6 +27,16 @@ const router = createRouter({
                     path: 'cities',
                     component: () => import('../pages/admin//CitiesPage.vue'),
                     name: "admin.cities"
+                },
+                {
+                    path: 'restaurants',
+                    component: () => import('../pages/admin/RestaurantsPage.vue'),
+                    name: "admin.restaurants"
+                },
+                {
+                    path: 'restaurants/:id',
+                    component: () => import('../pages/admin/RestaurantsEditDetailsPage.vue'),
+                    name: 'admin.restaurants.details'
                 }
             ]
         }

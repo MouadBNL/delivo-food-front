@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NButton, NMessageProvider } from "naive-ui";
+import { NButton, NDialogProvider, NMessageProvider } from "naive-ui";
 import { onMounted } from "vue";
 import { useAuthStore } from "./stores/use-auth-store";
 const authStore = useAuthStore()
@@ -12,6 +12,8 @@ onMounted(async () => {
 
 <template>
   <NMessageProvider>
-    <RouterView></RouterView>
+    <NDialogProvider>
+      <RouterView></RouterView>
+    </NDialogProvider>
   </NMessageProvider>
 </template>
