@@ -32,7 +32,7 @@ onMounted(async () => {
         </router-link>
 			</div>
 			<div class="flex items-center gap-5">
-				<span class=" inline-block">
+				<span v-if="authStore.user" class=" inline-block">
 					{{ authStore.user.name }}
 				</span>
 				<NButton type="error" @click="handleLogout">

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NButton, NFormItem, NInput, NInputNumber, NSelect, useMessage } from 'naive-ui';
+import { NButton, NCard, NFormItem, NInput, NInputNumber, NModal, NSelect, useMessage } from 'naive-ui';
 import Cart from '../components/Cart.vue';
 import NavHeader from '../components/NavHeader.vue';
 import { ref } from 'vue';
@@ -7,6 +7,7 @@ import http from '../services/http';
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { useAuthStore } from '../stores/use-auth-store';
+import useMapbox from '../composables/use-mapbox';
 
 const authStore = useAuthStore()
 const msg = useMessage()
@@ -40,14 +41,24 @@ const items = ref<{
                 "name": string
             }
         }
-    }
+    },
+    distances: {item_id: number, distance: number}[]
 }[]>([])
 const search = async () => {
     try {
         isSearchLoading.value = true;
         items.value = []
         const res = await http.get('/search', {
-            params: searchQuery
+            params: {
+                search: searchQuery.search,
+                cityid:  searchQuery.cityid,
+                min_price: searchQuery.min_price,
+                max_price:  searchQuery.max_price,
+                min_estimated_time:  searchQuery.min_estimated_time,
+                max_estimated_time:  searchQuery.max_estimated_time,
+                max_distance:  searchQuery.max_distance,
+                user_coor: userCoordinates.value
+            }
         })
         items.value = res.data.items
     } catch (error) {
@@ -81,11 +92,34 @@ const searchQuery = reactive({
     max_estimated_time: 0,
     max_distance: 0
 })
+
+const userCoordinates = ref(localStorage.getItem('user-coor') ?? "-6.855317384684781 33.427798286801334")
+const showMapModal = ref(false)
+const openMapModal = () => {
+    const initcorr =userCoordinates.value.split(" ").map(e => Number.parseFloat(e)) as [number, number]
+        const mbx = useMapbox('map-user', initcorr, (coor) => {
+            localStorage.setItem("user-coor", coor.lng + " " + coor.lat)
+            userCoordinates.value = coor.lng + " " + coor.lat
+        })
+    showMapModal.value = true
+    setTimeout(() => {
+        mbx.initMap()
+    }, 200)
+}
 </script>
 
 <template>
     <NavHeader/>
 
+    <NModal v-model:show="showMapModal">
+        <div class="w-1/2">
+            <NCard>
+                <div class="aspect-video" id="map-user">
+    
+                </div>
+            </NCard>
+        </div>
+    </NModal>
     <main class="bg-gray-50 min-h-screen py-16">
 
 
@@ -109,11 +143,15 @@ const searchQuery = reactive({
                 <NFormItem label="Max estimated time">
                     <NInputNumber v-model:value="searchQuery.max_estimated_time" class="w-full"/>
                 </NFormItem>
-                <!-- <NFormItem label="Max distance">
+                <NFormItem label="Max distance">
                     <NInputNumber v-model:value="searchQuery.max_distance" class="w-full"/>
-                </NFormItem> -->
+                </NFormItem>
             </div>
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-8">
+                <div class="flex gap-4">
+                    <NInput :value="userCoordinates" placeholder="coordinates"/>
+                    <NButton @click="openMapModal">Set coordinates</NButton>
+                </div>
                 <NButton class="w-full" type="info" @click="search">Search</NButton>
             </div>
         </div>
@@ -123,7 +161,7 @@ const searchQuery = reactive({
                     
                     <div v-if="!isSearchLoading && items.length > 0" class="grid grid-cols-3 gap-x-4 gap-y-8">
                         <div v-for="item in items" :key="item.name">
-                            <img :src="item.image" class="block aspect-video rounded-lg mb-4 object-cover shadow h-36" />
+                            <img :src="item.image" class="block w-full rounded-lg mb-4 object-cover shadow h-36" />
                             <div class="flex justify-between gap-2">
                                 <div>
                                     <h4 class="text-lg">{{ item.name }}</h4>
