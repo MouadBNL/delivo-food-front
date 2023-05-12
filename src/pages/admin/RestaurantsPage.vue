@@ -5,11 +5,17 @@ import { ref } from 'vue';
 import { h } from 'vue';
 import http from '../../services/http';
 import router from '../../router';
+import useMapbox from '../../composables/use-mapbox'
 
 const dialog = useDialog()
 const msg = useMessage()
 const data = ref([])
 const isLoading = ref(true)
+
+const mapbox = useMapbox('restau-map', [-6.922670418309508, 33.21445055890884], (coor) => {
+    console.log(coor, {map: mapbox.map})
+    editableModel.value.coordinates = coor.lng + " " + coor.lat;
+})
 
 interface ModelI {
     id: number,
@@ -32,7 +38,7 @@ const editableModel = ref<ModelI>({
     banner: null,
     address: "",
     phone: "",
-    coordinates: "",
+    coordinates: "0 0",
     city_id: null
 })
 const resetEditableModel = () => {
@@ -168,10 +174,16 @@ const cols = [
                                 editableModel.value.slug = row.slug
                                 editableModel.value.address = row.address
                                 editableModel.value.phone = row.phone
-                                editableModel.value.coordinates = row.phone
+                                editableModel.value.coordinates = row.coordinates
                                 editableModel.value.city_id = row.city.id
                                 modalMode.value = 'update'
                                 showModal.value = true
+                                setTimeout(() => {
+                                    mapbox.initMap()
+                                    let coor = row.coordinates.split(' ').map(e => Number.parseFloat(e));
+                                    console.log({coor, map: mapbox.map.value})
+                                    mapbox.map.value.setCenter(coor)
+                                }, 200)
                             },
                         },
                         {
@@ -215,8 +227,13 @@ const cols = [
 ]
 const openCreate = () => {
     resetEditableModel()
-    modalMode.value = 'create'
+    mapbox.initMap()
+    
     showModal.value = true
+    setTimeout(() => {
+        mapbox.map.value.setCenter([-6.922670418309508, 33.21445055890884])
+        modalMode.value = 'create'
+    }, 200)
 }
 
 const citiesOption = ref<{lable:string, value:number}[]>([])
@@ -244,7 +261,7 @@ const handleFileSelection = (data: { fileList: UploadFileInfo[] }) => {
 <template>
     <NModal v-model:show="showModal">
         <div class="w-1/3">
-            <NCard :title="modalMode == 'update' ? 'edit restaurant id:' + editableModel.id : 'Create a new User'">
+            <NCard>
                 <NFormItem label="Name">
                     <NInput v-model:value="editableModel.name" />
                 </NFormItem>
@@ -261,8 +278,13 @@ const handleFileSelection = (data: { fileList: UploadFileInfo[] }) => {
                     <NSelect v-model:value="editableModel.city_id" :options="citiesOption" />
                 </NFormItem>
                 <NFormItem label="Coordinates">
-                    <NInput v-model:value="editableModel.coordinates" />
+                    <NInput :value="editableModel.coordinates" />
                 </NFormItem>
+
+                <div class="p-1 rounded bg-gray-50 mb-4">
+                    <div id="restau-map" class="rounded overflow-hidden" style="height: 200px;"></div>
+                </div>
+
                 <NFormItem label="Image">
                     <n-upload
                         ref="uploadRef"
